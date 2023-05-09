@@ -19,11 +19,12 @@ public class Main {
 
 
 
-        ArrayList<String> newList = new ArrayList<String>(cls.getVilles().subList(0, 4));
-            var newCls = new Cluster();
-            newCls.setVilles(newList);
-        int[][] matrice=LD.MatriceDistance(newList);
-        var t = LD.MHierarchiqueAscendent( matrice,newCls);
+//        ArrayList<String> newList = new ArrayList<String>(cls.getVilles().subList(0, 4));
+//            var newCls = new Cluster();
+//            newCls.setVilles(newList);
+
+        int[][] matrice=LD.MatriceDistance(cls.getVilles());
+        var t = LD.MHierarchiqueAscendent( matrice,cls);
         LevenshteinDistance.printMatrix(t);
         //LevenshteinDistance.printMtx(matrice);
 

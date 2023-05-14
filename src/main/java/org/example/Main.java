@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         LevenshteinDistance LD = new LevenshteinDistance();
         Cluster cls = new Cluster();
-        cls.setVilles(chargerFichierExcel("C:/Users/youss/Desktop/datasetDM/ma.xlsx"));
+        cls.setVilles(chargerFichierExcel("C:/Users/youss/Desktop/datasetDM/Book1.xlsx"));
             for (String ville : cls.getVilles()) {
                 //System.out.println(ville);
 

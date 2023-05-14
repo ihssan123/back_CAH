@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class LevenshteinDistance {
     public static int levenshteinDistance(String s1, String s2) {
@@ -25,8 +26,23 @@ public class LevenshteinDistance {
 
         return d[m][n];
     }
+    public static void fusionnerVilles(ArrayList<String> data, ArrayList<String> villesAFusionner) {
+
+        StringBuilder nouvelleVille = new StringBuilder();
+        for (String ville : villesAFusionner) {
+            nouvelleVille.append(ville).append("§");
+        }
+        nouvelleVille.deleteCharAt(nouvelleVille.length() - 1);
 
 
+        int index = data.indexOf(villesAFusionner.get(0));
+
+        data.set(index, nouvelleVille.toString());
+
+
+        data.removeAll(villesAFusionner);
+
+    }
     public  int[][]  MatriceDistance(ArrayList<String> data){
         int size= data.size();
         int[][] matrice = new int[size][size];
@@ -85,45 +101,75 @@ public class LevenshteinDistance {
 //        return clusters;
 //    }
     public ArrayList<ArrayList<String>> MHierarchiqueAscendent(int[][] MatriceSimilarite, Cluster data) {
-        int ligne=0;
-        int colonne=0;
+
         var result = new ArrayList<ArrayList<String>>();
         while (data.getVilles().size() > 1) {
 
-            int min = MatriceSimilarite[0][1];
-            for (int i = 0; i < MatriceSimilarite.length; i++) {
-                for (int j = i+1; j < MatriceSimilarite.length; j++) {
-                    if (i != j) {
-                        if (MatriceSimilarite[i][j] < min)
-                            min = MatriceSimilarite[i][j];
-                            ligne=i;
-                            colonne=j;
+            int min = getMatrixMin(MatriceSimilarite);
 
-
-                    }
-
-                }
+            var points = getIndexesOfEelement(MatriceSimilarite,min);
+            var rowClasses = new ArrayList<String>();
+            var columnClasses = new ArrayList<String>();
+            for(var point : points){
+                rowClasses.add(data.getVilles().get(point.row));
+                columnClasses.add(data.getVilles().get(point.column));
             }
-            fusionnerVilles(data.getVilles(),data.getVilles().get(ligne),data.getVilles().get(colonne));
+
+            if(!checkNoCommonElements(rowClasses,columnClasses)){
+                var classesTobeAdded = mergeArrayLists(rowClasses,columnClasses);
+
+                fusionnerVilles(data.getVilles(),classesTobeAdded);
+
+            }else{
+                int ligne=points.get(0).row;
+                int colonne=points.get(0).column;
+                fusionnerVilles(data.getVilles(),data.getVilles().get(ligne),data.getVilles().get(colonne));
+            }
+
             result.add(new ArrayList<>(data.getVilles()));
              MatriceSimilarite = MatriceDistance(data.getVilles());
-//            for(int i=0;i<MatriceSimilarite.length;i++){
-//                if(MatriceSimilarite[ligne][i]>=MatriceSimilarite[colonne][i]&&MatriceSimilarite[i][ligne]>=MatriceSimilarite[i][colonne]) {
-//                    MatriceSimilarite[ligne][i] = MatriceSimilarite[colonne][i];
-//                    MatriceSimilarite[i][ligne] = MatriceSimilarite[i][colonne];
-//
-//                }
-//
-//            }
-//            data.getVilles().remove(colonne+1);
-//            data.getVilles().remove(ligne+1);
-
-
-
-
         }
         return result;
 
+    }
+    public static ArrayList<String> mergeArrayLists(ArrayList<String> list1, ArrayList<String> list2) {
+        HashSet<String> set = new HashSet<>();
+
+        set.addAll(list1);
+        set.addAll(list2);
+
+        return new ArrayList<>(set);
+    }
+    public static boolean checkNoCommonElements(ArrayList<String> list1, ArrayList<String> list2) {
+        for (String element : list1) {
+            if (list2.contains(element)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public static int getMatrixMin(int[][] MatriceSimilarite){
+        int min = MatriceSimilarite[0][1];
+        for (int i = 0; i < MatriceSimilarite.length; i++) {
+            for (int j = i+1; j < MatriceSimilarite.length; j++) {
+                if (i != j) {
+                    if (MatriceSimilarite[i][j] < min)
+                        min = MatriceSimilarite[i][j];
+                }
+
+            }
+        }
+        return min;
+    }
+
+    public static ArrayList<Point> getIndexesOfEelement(int[][] MatriceSimilarite,int min){
+        var points = new ArrayList<Point>();
+        for (int i = 0; i < MatriceSimilarite.length; i++) {
+            for (int j = i+1; j < MatriceSimilarite.length; j++) {
+                if(MatriceSimilarite[i][j] == min) points.add(new Point(i,j));
+            }
+        }
+        return points;
     }
     public static int[][] deleteElement(int[][] matrix, int rowToDelete, int colToDelete) {
         int numRows = matrix.length;
